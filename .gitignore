@@ -1,0 +1,14 @@
+SimpleWindowScreenshot*
+
+go.sum
+
+result*
+
+*.exe~
+*.dll
+*.so
+*.dylib
+
+**/bin
+**/*.log
+**/*.DS_Store
