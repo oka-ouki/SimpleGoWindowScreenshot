@@ -158,10 +158,11 @@ public:
     }
     ((void (*)(id, SEL))objc_msgSend)(m_window, "center"_sel);
   }
-  void save_screenshot(int width, int height, const std::string path) {
+  void save_screenshot(const std::string path) {
     id content_view = ((id(*)(id, SEL))objc_msgSend)(m_window, "contentView"_sel);
+    CGRect content_view_frame = ((CGRect(*)(id, SEL))objc_msgSend_stret)(content_view, "frame"_sel);
     id img_data = ((id(*)(id, SEL, CGRect))objc_msgSend)(content_view, "dataWithPDFInsideRect:"_sel,
-        CGRectMake(0, 0, width, height));
+        CGRectMake(0, 0, content_view_frame.size.width, content_view_frame.size.height));
     id img = ((id(*)(id, SEL, id))objc_msgSend)(
         ((id(*)(id, SEL))objc_msgSend)("NSImage"_cls, "alloc"_sel),
         "initWithData:"_sel, img_data);
@@ -203,7 +204,7 @@ SCREENSHOT_API void screenshot_run(int w, int h, const char *title, const char *
   static_cast<window *>(ww)->set_title(title);
   static_cast<window *>(ww)->set_size(w, h, WINDOW_HINT_NONE);
   static_cast<window *>(ww)->set_contentview(w, h);
-  static_cast<window *>(ww)->save_screenshot(w, h, path);
+  static_cast<window *>(ww)->save_screenshot(path);
   static_cast<window *>(ww)->run();
 }
 
