@@ -31,7 +31,7 @@ func main() {
 	title := C.CString("Sample")
 	defer C.free(unsafe.Pointer(title))
 
-	filePath := filepath.Join(filepath.Dir(exe), "result.bmp")
+	filePath := filepath.Join(filepath.Dir(exe), "result.png")
 	path := C.CString(filePath)
 	defer C.free(unsafe.Pointer(path))
 
