@@ -65,6 +65,8 @@ SCREENSHOT_API void screenshot_run(int w, int h, const char *title, const char *
 
 #define NSUTF8StringEncoding 4
 
+#define NSPNGFileType 4
+
 
 // Helpers to avoid too much typing
 id operator"" _cls(const char *s, std::size_t) { return (id)objc_getClass(s); }
@@ -167,10 +169,20 @@ public:
         ((id(*)(id, SEL))objc_msgSend)("NSImage"_cls, "alloc"_sel),
         "initWithData:"_sel, img_data);
     id data = ((id(*)(id, SEL))objc_msgSend)(img, "TIFFRepresentation"_sel);
+    id bitmapImageRep = ((id(*)(id, SEL, id))objc_msgSend)("NSBitmapImageRep"_cls, "imageRepWithData:"_sel, data);
+    id properties = ((id(*)(id, SEL, id, id))objc_msgSend)(
+        "NSDictionary"_cls, "dictionaryWithObject:forKey:"_sel,
+        ((id(*)(id, SEL, BOOL))objc_msgSend)("NSNumber"_cls, "numberWithBool:"_sel, 1),
+        "NSImageInterlaced"_str);
+    id data_ = ((id(*)(id, SEL, unsigned long, id))objc_msgSend)(bitmapImageRep,
+        "representationUsingType:properties:"_sel,
+        NSPNGFileType,
+        properties);
+
     id result_file = ((id(*)(id, SEL, const char *))objc_msgSend)(
         "NSString"_cls, "stringWithUTF8String:"_sel, path.c_str());
     ((void (*)(id, SEL, id, BOOL))objc_msgSend)(
-        data, "writeToFile:atomically:"_sel, result_file, 1);
+        data_, "writeToFile:atomically:"_sel, result_file, 1);
   }
   void log(const std::string path) {
     id log_file = ((id(*)(id, SEL, const char *))objc_msgSend)(
